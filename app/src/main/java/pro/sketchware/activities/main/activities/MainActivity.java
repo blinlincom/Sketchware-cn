@@ -50,7 +50,7 @@ import mod.tyron.backup.SingleCopyTask;
 import pro.sketchware.R;
 import pro.sketchware.activities.about.AboutActivity;
 import pro.sketchware.activities.main.fragments.projects.ProjectsFragment;
-import pro.sketchware.activities.main.fragments.projects_store.ProjectsStoreFragment;
+// import pro.sketchware.activities.main.fragments.projects_store.ProjectsStoreFragment;
 import pro.sketchware.databinding.MainBinding;
 import pro.sketchware.lib.base.BottomSheetDialogView;
 import pro.sketchware.utility.FileUtil;
@@ -59,7 +59,7 @@ import pro.sketchware.utility.UI;
 
 public class MainActivity extends BasePermissionAppCompatActivity {
     private static final String PROJECTS_FRAGMENT_TAG = "projects_fragment";
-    private static final String PROJECTS_STORE_FRAGMENT_TAG = "projects_store_fragment";
+    // private static final String PROJECTS_STORE_FRAGMENT_TAG = "projects_store_fragment";
     private ActionBarDrawerToggle drawerToggle;
     private DB u;
     private Snackbar storageAccessDenied;
@@ -72,13 +72,12 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         }
     };
     private ProjectsFragment projectsFragment;
-    private ProjectsStoreFragment projectsStoreFragment;
+    // private ProjectsStoreFragment projectsStoreFragment;
     private Fragment activeFragment;
     @IdRes
     private int currentNavItemId = R.id.item_projects;
 
     @Override
-    // onRequestPermissionsResult but for Storage access only, and only when granted
     public void g(int i) {
         if (i == 9501) {
             allFilesAccessCheck();
@@ -97,12 +96,10 @@ public class MainActivity extends BasePermissionAppCompatActivity {
     }
 
     @Override
-    public void l() {
-    }
+    public void l() { }
 
     @Override
-    public void m() {
-    }
+    public void m() { }
 
     public void n() {
         if (activeFragment instanceof ProjectsFragment) {
@@ -178,8 +175,7 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         binding.drawerLayout.addDrawerListener(drawerToggle);
         binding.drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-            }
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) { }
 
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
@@ -188,12 +184,10 @@ public class MainActivity extends BasePermissionAppCompatActivity {
             }
 
             @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-            }
+            public void onDrawerClosed(@NonNull View drawerView) { }
 
             @Override
-            public void onDrawerStateChanged(int newState) {
-            }
+            public void onDrawerStateChanged(int newState) { }
         });
 
         boolean hasStorageAccess = isStoragePermissionGranted();
@@ -209,12 +203,10 @@ public class MainActivity extends BasePermissionAppCompatActivity {
             if (data != null) {
                 new SingleCopyTask(this, new SingleCopyTask.CallBackTask() {
                     @Override
-                    public void onCopyPreExecute() {
-                    }
+                    public void onCopyPreExecute() { }
 
                     @Override
-                    public void onCopyProgressUpdate(int progress) {
-                    }
+                    public void onCopyProgressUpdate(int progress) { }
 
                     @Override
                     public void onCopyPostExecute(String path, boolean wasSuccessful, String reason) {
@@ -232,8 +224,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
                             } else {
                                 manager.doRestore(path, true);
                             }
-
-                            // Clear intent so it doesn't duplicate
                             getIntent().setData(null);
                         } else {
                             SketchwareUtil.toastError("Failed to copy backup file to temporary location: " + reason, Toast.LENGTH_LONG);
@@ -262,41 +252,45 @@ public class MainActivity extends BasePermissionAppCompatActivity {
             if (!isFinishing()) bottomSheetDialog.show();
         }
 
+        // 只保留项目 Fragment
         binding.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.item_projects) {
                 navigateToProjectsFragment();
                 return true;
-            } else if (id == R.id.item_sketchub) {
-                navigateToSketchubFragment();
-                return true;
             }
+            // else if (id == R.id.item_sketchub) {
+            //     navigateToSketchubFragment();
+            //     return true;
+            // }
             return false;
         });
 
         if (savedInstanceState != null) {
             projectsFragment = (ProjectsFragment) getSupportFragmentManager().findFragmentByTag(PROJECTS_FRAGMENT_TAG);
-            projectsStoreFragment = (ProjectsStoreFragment) getSupportFragmentManager().findFragmentByTag(PROJECTS_STORE_FRAGMENT_TAG);
+            // projectsStoreFragment = (ProjectsStoreFragment) getSupportFragmentManager().findFragmentByTag(PROJECTS_STORE_FRAGMENT_TAG);
             currentNavItemId = savedInstanceState.getInt("selected_tab_id");
             Fragment current = getFragmentForNavId(currentNavItemId);
             if (current instanceof ProjectsFragment) {
                 navigateToProjectsFragment();
-            } else if (current instanceof ProjectsStoreFragment) {
-                navigateToSketchubFragment();
             }
-
+            // else if (current instanceof ProjectsStoreFragment) {
+            //     navigateToSketchubFragment();
+            // }
             return;
         }
 
         navigateToProjectsFragment();
     }
 
+    // 只保留项目 Fragment
     private Fragment getFragmentForNavId(int navItemId) {
         if (navItemId == R.id.item_projects) {
             return projectsFragment;
-        } else if (navItemId == R.id.item_sketchub) {
-            return projectsStoreFragment;
         }
+        // else if (navItemId == R.id.item_sketchub) {
+        //     return projectsStoreFragment;
+        // }
         throw new IllegalArgumentException();
     }
 
@@ -328,27 +322,25 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         currentNavItemId = R.id.item_projects;
     }
 
-    private void navigateToSketchubFragment() {
-        if (projectsStoreFragment == null) {
-            projectsStoreFragment = new ProjectsStoreFragment();
-        }
-
-        boolean shouldShow = true;
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-
-        binding.createNewProject.hide();
-        if (activeFragment != null) transaction.hide(activeFragment);
-        if (fm.findFragmentByTag(PROJECTS_STORE_FRAGMENT_TAG) == null) {
-            shouldShow = false;
-            transaction.add(binding.container.getId(), projectsStoreFragment, PROJECTS_STORE_FRAGMENT_TAG);
-        }
-        if (shouldShow) transaction.show(projectsStoreFragment);
-        transaction.commit();
-
-        activeFragment = projectsStoreFragment;
-        currentNavItemId = R.id.item_sketchub;
-    }
+    // 注释掉项目商店 Fragment 切换
+    // private void navigateToSketchubFragment() {
+    //     if (projectsStoreFragment == null) {
+    //         projectsStoreFragment = new ProjectsStoreFragment();
+    //     }
+    //     boolean shouldShow = true;
+    //     FragmentManager fm = getSupportFragmentManager();
+    //     FragmentTransaction transaction = fm.beginTransaction();
+    //     binding.createNewProject.hide();
+    //     if (activeFragment != null) transaction.hide(activeFragment);
+    //     if (fm.findFragmentByTag(PROJECTS_STORE_FRAGMENT_TAG) == null) {
+    //         shouldShow = false;
+    //         transaction.add(binding.container.getId(), projectsStoreFragment, PROJECTS_STORE_FRAGMENT_TAG);
+    //     }
+    //     if (shouldShow) transaction.show(projectsStoreFragment);
+    //     transaction.commit();
+    //     activeFragment = projectsStoreFragment;
+    //     currentNavItemId = R.id.item_sketchub;
+    // }
 
     @NonNull
     private BottomSheetDialogView getBottomSheetDialogView() {
@@ -357,7 +349,7 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         bottomSheetDialog.setDescription("""
                 There have been major changes since v6.3.0 fix1, \
                 and it's very important to know them all if you want your projects to still work.
-                
+
                 You can view all changes whenever you want at the About Sketchware Pro screen.""");
 
         bottomSheetDialog.setPositiveButton("View changes", (dialog, which) -> {
@@ -394,7 +386,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        /* Check if the device is running low on storage space */
         long freeMegabytes = GB.c();
         if (freeMegabytes < 100 && freeMegabytes > 0) {
             showNoticeNotEnoughFreeStorageSpace();
@@ -472,7 +463,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
 
     //This is annoying Please remove/togglize it
     private void tryLoadingCustomizedAppStrings() {
-        // Refresh extracted provided strings file if necessary
         oB oB = new oB();
         try {
             File extractedStringsProvidedXml = new File(wq.m());
@@ -485,8 +475,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
             SketchwareUtil.toastError(message + ": " + e.getMessage());
             LogUtil.e("MainActivity", message, e);
         }
-
-        // Actual loading part
         if (xB.b().b(getApplicationContext())) {
             SketchwareUtil.toast(Helper.getResString(R.string.message_strings_xml_loaded));
         }
