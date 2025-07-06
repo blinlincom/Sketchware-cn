@@ -148,6 +148,9 @@ public class MainActivity extends BasePermissionAppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
+        if (com.google.firebase.FirebaseApp.getApps(this).isEmpty()) {
+    com.google.firebase.FirebaseApp.initializeApp(this);
+        }
         enableEdgeToEdgeNoContrast();
 
         tryLoadingCustomizedAppStrings();
